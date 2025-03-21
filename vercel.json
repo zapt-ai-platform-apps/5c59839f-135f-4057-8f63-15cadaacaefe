@@ -10,6 +10,10 @@
         }
     ],
     "functions": {
+        "api/import.js": {
+            "includeFiles": "../drizzle/schema.js",
+            "maxDuration": 60
+        },
         "api/*.js": {
             "includeFiles": "../drizzle/schema.js"
         }
