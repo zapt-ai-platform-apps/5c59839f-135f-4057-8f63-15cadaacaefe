@@ -55,9 +55,8 @@ export default async function handler(req, res) {
       const batch = subscribers.slice(i, i + batchSize);
       const contacts = batch.map(sub => ({
         email: sub.email,
-        first_name: sub.firstName || '',
-        last_name: sub.lastName || '',
         unsubscribed: false
+        // Removed first_name and last_name fields
       }));
       
       const addResponse = await resend.contacts.create({

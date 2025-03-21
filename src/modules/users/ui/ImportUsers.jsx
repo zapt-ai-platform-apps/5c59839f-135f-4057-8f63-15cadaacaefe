@@ -8,6 +8,7 @@ export default function ImportUsers() {
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
   const [lastImportDate, setLastImportDate] = useState(null);
+  const [importState, setImportState] = useState(null);
   const { session } = useAuth();
   
   // Fetch the last import date when component mounts
@@ -28,6 +29,11 @@ export default function ImportUsers() {
           if (data.lastImportDate) {
             setLastImportDate(new Date(data.lastImportDate));
           }
+          
+          setImportState({
+            importInProgress: data.importInProgress,
+            lastCursor: data.lastCursor
+          });
         }
       } catch (err) {
         console.error('Error fetching last import date:', err);
@@ -39,7 +45,7 @@ export default function ImportUsers() {
     }
   }, [session]);
   
-  const handleImport = async (importAll = false) => {
+  const handleImport = async (importAll = false, resumeImport = false) => {
     setIsImporting(true);
     setError(null);
     setResult(null);
@@ -52,7 +58,8 @@ export default function ImportUsers() {
           'Authorization': `Bearer ${session?.access_token}`
         },
         body: JSON.stringify({
-          importAll
+          importAll,
+          resumeImport
         }),
       });
       
@@ -68,6 +75,12 @@ export default function ImportUsers() {
       if (data.importTime) {
         setLastImportDate(new Date(data.importTime));
       }
+      
+      // Update the import state
+      setImportState({
+        importInProgress: false,
+        lastCursor: null
+      });
     } catch (err) {
       console.error('Import error:', err);
       setError(err.message);
@@ -103,10 +116,35 @@ export default function ImportUsers() {
             <p className="text-sm text-blue-700">
               <strong>Last Import:</strong> {formatDate(lastImportDate)}
             </p>
+            
+            {importState?.importInProgress && (
+              <p className="text-sm text-orange-700 mt-2">
+                <strong>Note:</strong> An import appears to be in progress or was interrupted.
+                You can resume the previous import.
+              </p>
+            )}
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+          {importState?.importInProgress && (
+            <Button 
+              onClick={() => handleImport(false, true)} 
+              disabled={isImporting}
+              className="bg-orange-600 hover:bg-orange-700 text-white cursor-pointer"
+            >
+              {isImporting ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Resuming...
+                </>
+              ) : 'Resume Previous Import'}
+            </Button>
+          )}
+          
           <Button 
             onClick={() => handleImport(false)} 
             disabled={isImporting}
