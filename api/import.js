@@ -1,4 +1,4 @@
-import { getDbClient, handleApiError } from './_apiUtils.js';
+import { getDbClient, handleApiError, authenticateUser } from './_apiUtils.js';
 import { emailManagement } from '../drizzle/schema.js';
 import { eq } from 'drizzle-orm';
 import Sentry from './_sentry.js';
@@ -9,6 +9,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Authenticate user first
+    await authenticateUser(req);
+
     const intercomToken = process.env.INTERCOM_API_TOKEN;
     if (!intercomToken) {
       return res.status(500).json({ error: 'Intercom API token is not configured' });

@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import Button from '../../core/ui/Button';
 import Alert from '../../core/ui/Alert';
+import { useAuth } from '@/modules/auth/hooks/useAuth';
 
 export default function ImportUsers() {
   const [isImporting, setIsImporting] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
+  const { session } = useAuth();
   
   const handleImport = async () => {
     setIsImporting(true);
@@ -17,6 +19,7 @@ export default function ImportUsers() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`
         },
         body: JSON.stringify({
           page: 1,

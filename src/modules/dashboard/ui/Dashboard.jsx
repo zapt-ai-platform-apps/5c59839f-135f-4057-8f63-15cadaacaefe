@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StatCard from './StatCard';
 import { fetchStats } from '../services';
+import { useAuth } from '@/modules/auth/hooks/useAuth';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({
@@ -10,10 +11,12 @@ export default function Dashboard() {
     totalBroadcasts: 0
   });
   const [loading, setLoading] = useState(true);
+  const { session } = useAuth();
 
   useEffect(() => {
     async function loadStats() {
       try {
+        // In a real app, we'd fetch this from the API with authentication
         const data = await fetchStats();
         setStats(data);
       } catch (error) {
@@ -24,7 +27,7 @@ export default function Dashboard() {
     }
 
     loadStats();
-  }, []);
+  }, [session]);
 
   return (
     <div>

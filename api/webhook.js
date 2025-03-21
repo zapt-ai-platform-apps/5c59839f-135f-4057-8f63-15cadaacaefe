@@ -9,7 +9,9 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Validate webhook signature if needed
+    // Note: No authentication for webhooks as they come from Resend
+    // Validate webhook signature if needed in the future
+    
     const payload = req.body;
     console.log('Webhook received:', JSON.stringify(payload));
     

@@ -1,6 +1,5 @@
-import { getDbClient, handleApiError } from './_apiUtils.js';
-import { emailBroadcasts, emailReceipts, emailManagement } from '../drizzle/schema.js';
-import { eq } from 'drizzle-orm';
+import { getDbClient, handleApiError, authenticateUser } from './_apiUtils.js';
+import { emailBroadcasts, emailReceipts } from '../drizzle/schema.js';
 import { Resend } from 'resend';
 import Sentry from './_sentry.js';
 
@@ -10,6 +9,9 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Authenticate user first
+    await authenticateUser(req);
+
     const resendApiKey = process.env.RESEND_API_KEY;
     if (!resendApiKey) {
       return res.status(500).json({ error: 'Resend API key is not configured' });
