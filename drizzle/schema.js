@@ -7,7 +7,9 @@ export const emailManagement = pgTable('email_management', {
   lastName: text('last_name'),
   isUnsubscribed: boolean('is_unsubscribed').default(false),
   unsubscribedAt: timestamp('unsubscribed_at'),
-  createdAt: timestamp('created_at').defaultNow()
+  createdAt: timestamp('created_at').defaultNow(),
+  intercomId: text('intercom_id'),
+  lastImportedAt: timestamp('last_imported_at')
 });
 
 export const emailBroadcasts = pgTable('email_broadcasts', {
